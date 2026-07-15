@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학사안내 AI 챗봇</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🏫 학사안내 AI 챗봇</h1>
+            <p>성서학·AI융합·사회복지·영유아보육·간호학과 정보 제공</p>
+        </div>
+
+        <div class="chat-window" id="chat-window">
+            <div class="message bot-message">
+                <span class="message-content">안녕하세요! 우리 학교 학과 정보, 교수님 경력, 졸업 학점 등에 대해 무엇이든 물어보세요!</span>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="질문을 입력하세요... (예: 간호학과 졸업학점 알려줘)" autocomplete="off">
+            <button id="send-button">전송</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>

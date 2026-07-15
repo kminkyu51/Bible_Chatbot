@@ -1,0 +1,132 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* 챗봇 전체 화면 박스 */
+.chat-container {
+    width: 100%;
+    max-width: 600px;
+    height: 90vh;
+    background-color: #ffffff;
+    border: 2px solid #ff6b00;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* 상단 헤더 영역 */
+.chat-header {
+    background-color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #ff6b00;
+}
+
+.chat-header h1 {
+    color: #ff6b00;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.chat-header p {
+    color: #666666;
+    font-size: 14px;
+}
+
+/* 채팅 메시지가 쌓이는 영역 */
+.chat-window {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 메시지 말풍선 공통 스타일 */
+.message {
+    display: flex;
+    max-width: 80%;
+}
+
+.message-content {
+    padding: 12px 18px;
+    border-radius: 20px;
+    font-size: 15px;
+    line-height: 1.4;
+    word-break: break-all;
+}
+
+/* 봇 메시지 (왼쪽, 흰색 배경에 주황색 테두리) */
+.bot-message {
+    align-self: flex-start;
+}
+
+.bot-message .message-content {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1.5px solid #ff6b00;
+    border-top-left-radius: 4px;
+}
+
+/* 사용자 메시지 (오른쪽, 주황색 배경) */
+.user-message {
+    align-self: flex-end;
+}
+
+.user-message .message-content {
+    background-color: #ff6b00;
+    color: #ffffff;
+    border-top-right-radius: 4px;
+}
+
+/* 하단 입력창 영역 */
+.input-container {
+    display: flex;
+    padding: 15px;
+    background-color: #ffffff;
+    border-top: 1px solid #eeeeee;
+    gap: 10px;
+}
+
+#user-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1.5px solid #ff6b00;
+    border-radius: 25px;
+    font-size: 15px;
+    outline: none;
+}
+
+#user-input::placeholder {
+    color: #aaaaaa;
+}
+
+#send-button {
+    background-color: #ff6b00;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#send-button:hover {
+    background-color: #e05e00;
+}
