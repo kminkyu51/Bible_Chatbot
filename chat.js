@@ -1,81 +1,86 @@
+// DOM(HTML)이 완전히 로드된 후 실행
 document.addEventListener('DOMContentLoaded', () => {
-    const chatWindow = document.getElementById('chat-window');
-    const userInput = document.getElementById('user-input');
+    const inputElement = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
 
-    // 화면에 메시지(말풍선)를 추가하는 함수
-    function appendMessage(sender, message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', `${sender}-message`);
-
-        const contentSpan = document.createElement('span');
-        contentSpan.classList.add('message-content');
-        contentSpan.innerText = message;
-
-        messageDiv.appendChild(contentSpan);
-        chatWindow.appendChild(messageDiv);
-
-        // 새 메시지가 오면 스크롤을 가장 아래로 자동 이동
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
-
-    // 서버(/chat)로 메시지를 전송하고 답변을 받는 비동기 함수
-    async function sendMessageToServer(userMessage) {
-        try {
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: userMessage }),
-            });
-
-            if (!response.ok) {
-                appendMessage('bot', '서버에서 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
-                return;
-            }
-
-            const data = await response.json();
-            
-            // 🟢 [수정 포인트] 파이썬 백엔드(app.py)가 주는 'reply' key와 이름을 똑같이 맞춰줍니다!
-            if (data && data.reply) {
-                appendMessage('bot', data.reply);
-            } else {
-                appendMessage('bot', '답변을 받아오지 못했습니다.');
-            }
-
-        } catch (error) {
-            console.error('통신 에러:', error);
-            appendMessage('bot', '서버와 연결할 수 없습니다. Flask 서버가 켜져 있는지 확인하세요.');
-        }
-    }
-
-    // 전송 처리 로직
-    function handleUserSend() {
-        const message = userInput.value.trim();
-        if (message === "") return; // 빈 칸이면 전송 안 함
-
-        console.log('전송 시도된 메시지:', message); // 디버깅용 확인 로그
-        appendMessage('user', message);
-        userInput.value = ''; // 입력창 비우기
-        sendMessageToServer(message);
-    }
-
-    // 전송 버튼 마우스 클릭 시
+    // 1. 전송 버튼 클릭 이벤트 등록
     if (sendButton) {
-        sendButton.addEventListener('click', () => {
-            handleUserSend();
-        });
+        sendButton.addEventListener('click', sendMessage);
     }
 
-    // 한글 입력(IME) 충돌 방지 완벽 적용 엔터키 이벤트!
-    if (userInput) {
-        userInput.addEventListener('keydown', (event) => {
-            // event.isComposing 은 한글 조합 중일 때 엔터키가 두 번 먹히거나 씹히는 걸 방지해 줌!
-            if (event.key === 'Enter' && !event.isComposing) {
-                event.preventDefault(); // 기본 줄바꿈 방지
-                handleUserSend();
+    // 2. 엔터키 입력 이벤트 등록
+    if (inputElement) {
+        inputElement.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
             }
         });
     }
 });
+
+// 메시지 전송 및 생각 중 로딩 처리 함수
+async function sendMessage() {
+    const inputElement = document.getElementById('user-input');
+    const chatWindow = document.getElementById('chat-window');
+
+    if (!inputElement || !chatWindow) return;
+
+    const userMessage = inputElement.value.trim();
+    if (!userMessage) return; // 빈 메시지 방지
+
+    // 1. 사용자 메시지 말풍선 출력
+    appendMessage('user', userMessage);
+    inputElement.value = '';
+
+    // 2. "🤖 생각 중..." 로딩 메시지 출력
+    const loadingMessageElement = appendMessage('bot', '🤖 생각 중...');
+    loadingMessageElement.classList.add('loading-text');
+
+    try {
+        // 3. 백엔드 서버 통신 (Flask /chat 엔드포인트)
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: userMessage }),
+        });
+
+        const data = await response.json();
+
+        // 4. "생각 중..." 문구를 실제 제미나이 답변으로 교체
+        if (response.ok && data.reply) {
+            loadingMessageElement.innerText = data.reply;
+        } else {
+            loadingMessageElement.innerText = '⚠️ 오류가 발생했습니다. 다시 시도해 주세요.';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        loadingMessageElement.innerText = '❌ 서버와 연결할 수 없습니다.';
+    } finally {
+        loadingMessageElement.classList.remove('loading-text');
+        chatWindow.scrollTop = chatWindow.scrollHeight; // 자동 스크롤 하단 이동
+    }
+}
+
+// 화면에 메시지 말풍선을 추가해 주는 함수
+function appendMessage(sender, text) {
+    const chatWindow = document.getElementById('chat-window');
+    
+    // 외부 감싸는 div 생성 (message, bot-message / user-message)
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('message', `${sender}-message`);
+
+    // 내부 span 생성 (message-content)
+    const messageContent = document.createElement('span');
+    messageContent.classList.add('message-content');
+    messageContent.innerText = text;
+
+    messageContainer.appendChild(messageContent);
+    chatWindow.appendChild(messageContainer);
+    
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    return messageContent; // 로딩 문구 교체를 위해 innerText 대상인 span 반환
+}
