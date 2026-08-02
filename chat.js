@@ -33,8 +33,8 @@ async function sendMessage() {
     appendMessage('user', userMessage);
     inputElement.value = '';
 
-    // 2. "🤖 생각 중..." 로딩 메시지 출력
-    const loadingMessageElement = appendMessage('bot', '🤖 생각 중...');
+    // 2. "생각 중..." 로딩 메시지 출력
+    const loadingMessageElement = appendMessage('bot', '생각 중...');
     loadingMessageElement.classList.add('loading-text');
 
     try {
